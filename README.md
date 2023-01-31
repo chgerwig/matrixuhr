@@ -4,7 +4,8 @@
 ![Foto der Uhr](bilder/IMG_0046.jpeg)
 
 Eine Uhr mit 3-4 8x8 Punktmatrix Modulen, welche einen MAX7219 Chip zur Ansteuerung verwenden.
-Ich habe das Projekt mit einem ESP8266 (ESP12E) realisiert.
+
+Ich habe das Projekt mit einem ESP8266 (ESP12E) realisiert. Zum Programmieren verwende ich Visual Studio Code und PlatformIO.
 
 So sieht die Elektronik innen aus:
 ![Foto der Elektronik](bilder/IMG_0048.jpeg)
