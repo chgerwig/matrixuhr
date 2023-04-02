@@ -1,10 +1,11 @@
-/* Matrixuhr von chgerwig@gmail.com Version 0.8 vom 29.1.2023
+/* Matrixuhr von chgerwig@gmail.com Version 0.9.1 vom 31.1.2023
 
  Hardware: ESP12E
  Funktionen:
  - Verbindet sich mit dem WLAN
  - Holt sich die ntp Zeit vom Internet
  - Zeigt die Zeit im 24 Stundenformat an
+ - Ändern der Schriftart
 */ 
 
 #include <MD_MAX72xx.h>
@@ -12,8 +13,6 @@
 #include <NTPClient.h>
 // change next line to use with another board/shield
 #include <ESP8266WiFi.h>
-//#include <WiFi.h> // for WiFi shield
-//#include <WiFi101.h> // for WiFi 101 shield or MKR1000
 #include <WiFiUdp.h>
 
 const char *ssid     = "openiot";
@@ -46,27 +45,6 @@ MD_MAX72XX mx = MD_MAX72XX(HARDWARE_TYPE, CS_PIN, MAX_DEVICES);
 #define BUF_SIZE  10
 char message[BUF_SIZE] = "Suche...";
 bool newMessageAvailable = true;
-
-void readSerial(void)
-{
-  static uint8_t	putIndex = 0;
-
-  while (Serial.available())
-  {
-    message[putIndex] = (char)Serial.read();
-    if ((message[putIndex] == '\n') || (putIndex >= BUF_SIZE-3))  // end of message character or full buffer
-    {
-      // put in a message separator and end the string
-      message[putIndex] = '\0';
-      // restart the index for next filling spree and flag we have a message waiting
-      putIndex = 0;
-      newMessageAvailable = true;
-    }
-    else
-      // Just save the next char in next location
-      message[putIndex++];
-  }
-}
 
 void printText(uint8_t modStart, uint8_t modEnd, char *pMsg)
 // Print the text string to the LED matrix modules specified.
