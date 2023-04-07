@@ -1,4 +1,4 @@
-/* Matrixuhr von chgerwig@gmail.com Version 0.9.1 vom 31.1.2023
+/* Matrixuhr von chgerwig@gmail.com Version 0.9.5 vom 2.4.2023
 
  Hardware: ESP12E
  Funktionen:
@@ -6,11 +6,13 @@
  - Holt sich die ntp Zeit vom Internet
  - Zeigt die Zeit im 24 Stundenformat an
  - Ändern der Schriftart
+ - Automatische Sommerzeit Umstellung
 */ 
 
 #include <MD_MAX72xx.h>
 #include <SPI.h>
-#include <NTPClient.h>
+//#include <NTPClient.h>
+#include <time.h>
 // change next line to use with another board/shield
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
@@ -18,8 +20,15 @@
 const char *ssid     = "openiot";
 const char *password = "lorawahn";
 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+/* Configuration of NTP */
+#define MY_NTP_SERVER "at.pool.ntp.org"           
+#define MY_TZ "CET-1CEST,M3.5.0/02,M10.5.0/03"   
+
+time_t now;                         // this is the epoch
+tm tm;                              // the structure tm holds time information in a more convient way
+
+//WiFiUDP ntpUDP;
+//NTPClient timeClient(ntpUDP);
 
 #define PRINT(s, v) { Serial.print(F(s)); Serial.print(v); }
 
@@ -133,19 +142,38 @@ void setup()
   for(int i=6; i<0; i--){
     message[i] = char(32);
   }
+
+  configTime(MY_TZ, MY_NTP_SERVER);
+
   printText(0, MAX_DEVICES-1, message);
-  timeClient.begin();
+  //timeClient.begin();
   // Set offset time in seconds to adjust for your timezone, for example:
   // GMT +1 = 3600
   // GMT +8 = 28800
-  timeClient.setTimeOffset(3600);
+  //timeClient.setTimeOffset(3600);
 
   Serial.print("/n[MD_MAX72XX Message Display]");
 }
 void loop()
 {
-  timeClient.update();
-  String formattedTime = timeClient.getFormattedTime();
+  //timeClient.update();
+  time(&now);                       // read the current time
+  localtime_r(&now, &tm);
+  String Stunde;
+  String Minute;
+// Wenn Stunde einstellig, dann eine 0 voranstellen
+  if (tm.tm_hour < 10){
+    Stunde = "0" + String(tm.tm_hour);
+  }else{
+    Stunde = String(tm.tm_hour);
+  }
+// Wenn Minute einstellig, dann eine 0 voranstellen
+  if (tm.tm_min < 10){
+    Minute = "0" + String(tm.tm_min);
+  }else{
+    Minute = String(tm.tm_min);
+  }
+  String formattedTime = Stunde + ":" + Minute;
   Serial.print("Formatted Time: ");
   Serial.println(formattedTime);  
   //prepare time for matrix
